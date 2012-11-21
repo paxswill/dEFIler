@@ -1,6 +1,9 @@
 #include <efi.h>
 #include <efilib.h>
 
+VOID searchBuffer(IN VOID *Buffer, IN UINT64 BufferLength);
+VOID printMemoryMap(IN UINT8 *mapDescBuffer, UINTN mapBytes, IN UINTN descSize);
+
 EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 	// Initialize the library
 	InitializeLib(image, systab);
@@ -38,6 +41,21 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 		Print(L"BS->GetMemoryMap(...): %r\n\r", retstat);
 		goto exit1;
 	}
+
+	printMemoryMap(mapDescBuffer, mapBytes, descSize);
+
+
+exit1:
+	uefi_call_wrapper(BS->FreePages, 2, mapDescPages, numPages);
+exit0:
+	return EFI_SUCCESS;
+}
+
+VOID searchBuffer(IN VOID *Buffer, IN UINT64 BufferLength) {
+	
+}
+
+VOID printMemoryMap(IN UINT8 *mapDescBuffer, UINTN mapBytes, IN UINTN descSize) {
 	UINT64 totalPages = 0;
 	UINT8 *i;
 	Print(L"buffer len: %d, descSize: %ld\r\n\r\n", mapBytes, descSize);
@@ -102,11 +120,4 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 		totalPages += mapDesc->NumberOfPages;
 	}
 	Print(L"Total pages: %ld\r\n", totalPages);
-
-exit1:
-	uefi_call_wrapper(BS->FreePages, 2, mapDescPages, numPages);
-exit0:
-	return EFI_SUCCESS;
 }
-
-
