@@ -1,3 +1,5 @@
+OBJCOPY := objcopy
+
 ARCH     = $(shell uname -m | sed s,i[3456789]86,ia32,)
 EFIROOT  = /usr
 HDRROOT  = $(EFIROOT)/include/efi
@@ -5,7 +7,7 @@ INCLUDES = -I. -I$(HDRROOT) -I$(HDRROOT)/$(ARCH) -I$(HDRROOT)/protocol
 
 CFLAGS = -O2 -fpic -Wall -fshort-wchar -fno-strict-aliasing -mno-red-zone \
 		 -fno-merge-constants -fno-stack-protector
-CPPFLAGS = -DCONFIG_$(ARCH)
+CPPFLAGS = $(INCLUDES) -DCONFIG_$(ARCH)
 ifeq ($(ARCH),x86_64)
 	CPPFLAGS += -DEFI_FUNCTION_WRAPPER
 endif
@@ -27,7 +29,7 @@ LOADLIBS = -lefi -lgnuefi $(shell $(CC) -print-libgcc-file-name)
 		-j .rel \
 		-j .rela \
 		-j .reloc \
-		--target=afi-app-$(ARCH) $^ $@
+		--target=efi-app-$(ARCH) $^ $@
 
 %.so: %.o
 	$(LD) $(LDFLAGS) $^ -o $@ $(LOADLIBS)
