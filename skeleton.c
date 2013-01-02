@@ -42,6 +42,7 @@ EFI_STATUS efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab) {
 		goto exit1;
 	}
 
+	// Dump the memory map
 	printMemoryMap(mapDescBuffer, mapBytes, descSize);
 
 
